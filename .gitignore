@@ -1,0 +1,9 @@
+*.pyc
+.env
+*.env
+*.log
+*.tmp
+models/
+outputs/
+.DS_Store
+Thumbs.db
