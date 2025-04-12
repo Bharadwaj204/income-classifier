@@ -7,8 +7,8 @@ This project is a machine learning model to classify income based on various dem
 - Data preprocessing, feature engineering, and model evaluation.
 - Visualizations comparing the performance of different models.
 
-## Setup
-
+## web
+https://income-classifier.streamlit.app/
 ### Prerequisites
 
 Make sure you have Python 3.6 or higher installed. You can download it from the official website: [python.org](https://www.python.org/downloads/).
