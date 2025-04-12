@@ -1,59 +1,53 @@
 import pandas as pd
 import joblib
-from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import GradientBoostingClassifier
+import os
+import re
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-import os
+from src.data_preprocessing import load_and_prepare_data
 
-# Load dataset
-data = pd.read_csv("data/adult_income.csv")
+# Loading the data
+print("Loading dataset...")
+X_train, X_test, y_train, y_test, label_encoders = load_and_prepare_data()
+print("Dataset loaded and preprocessed.")
 
-# Rename columns to match what Streamlit app expects
-data.columns = ['Age', 'Workclass', 'fnlwgt', 'Education', 'Education Num', 'Marital Status',
-                'Occupation', 'Relationship', 'Race', 'Sex', 'Capital Gain',
-                'Capital Loss', 'Hours/Week', 'Country', 'Target']
+# Checking the shapes
+print(f"Training data shape: {X_train.shape}")
+print(f"Testing data shape: {X_test.shape}")
 
-# Drop unnecessary column
-data.drop(columns=['fnlwgt'], inplace=True)
+# Define models
+models = {
+    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
+    "Gradient Boosting": GradientBoostingClassifier(random_state=42),
+    "Logistic Regression": make_pipeline(
+        StandardScaler(), LogisticRegression(solver='saga', max_iter=2000, random_state=42)
+    )
+}
 
-# Drop rows with missing values (if any)
-data.replace('?', pd.NA, inplace=True)
-data.dropna(inplace=True)
+# Train, evaluate, and save
+for model_name, model in models.items():
+    print(f"\nTraining {model_name}...")
+    model.fit(X_train, y_train.values.ravel())  # Avoid shape warning
+    print(f"{model_name} trained.")
 
-# Encode categorical columns
-categorical_columns = ['Workclass', 'Education', 'Marital Status', 'Occupation',
-                       'Relationship', 'Race', 'Sex', 'Country']
+    print(f"Evaluating {model_name}...")
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"{model_name} accuracy: {accuracy:.4f}")
 
-encoders = {}
+    print(f"Saving the {model_name} model...")
+    os.makedirs('models', exist_ok=True)
+    joblib.dump(model, f'models/{model_name.lower().replace(" ", "_")}_model.pkl')
 
-for col in categorical_columns:
-    le = LabelEncoder()
-    data[col] = data[col].astype(str)
-    le.fit(data[col])  # Fit on available data (ensure all values are there!)
-    data[col] = le.transform(data[col])
-    encoders[col] = le
+# Save encoders
+print("\nSaving encoders...")
+os.makedirs('models/encoders', exist_ok=True)
+for col, le in label_encoders.items():
+    safe_col = re.sub(r'[^\w\-]', '_', col)
+    joblib.dump(le, f'models/encoders/{safe_col}_encoder.pkl')
 
-# Encode target
-data['Target'] = data['Target'].apply(lambda x: 1 if '>50K' in x else 0)
-
-# Split data
-X = data.drop("Target", axis=1)
-y = data["Target"]
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Train model (you can try others too)
-model = GradientBoostingClassifier()
-model.fit(X_train, y_train)
-
-# Evaluate
-accuracy = accuracy_score(y_test, model.predict(X_test))
-print(f"Model accuracy: {accuracy:.4f}")
-
-# Save model and encoders
-os.makedirs("models/encoders", exist_ok=True)
-joblib.dump(model, "models/best_model.pkl")
-
-for col, encoder in encoders.items():
-    joblib.dump(encoder, f"models/encoders/{col}_encoder.pkl")
+print("Training and saving complete.")

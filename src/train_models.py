@@ -1,11 +1,12 @@
+# src/train_models.py
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
-from tqdm import tqdm  # For showing the progress bar
+from tqdm import tqdm
 
 def train_all_models(X_train, y_train):
-    print("Training models...")
+    """Train multiple classification models."""
     models = {
         "Logistic Regression": LogisticRegression(max_iter=1000),
         "Decision Tree": DecisionTreeClassifier(),
@@ -14,8 +15,7 @@ def train_all_models(X_train, y_train):
         "Gradient Boosting": GradientBoostingClassifier()
     }
 
-    # Using tqdm to show progress
     for name, model in tqdm(models.items(), desc="Training models", unit="model"):
         model.fit(X_train, y_train)
-    
+
     return models
