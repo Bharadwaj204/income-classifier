@@ -1,8 +1,13 @@
 *.pyc
-.env
-*.env
 *.log
 *.tmp
+.env
+*.env
+venv/
+__pycache__/
 outputs/
+*.pkl
+*.joblib
+models/
 .DS_Store
 Thumbs.db
