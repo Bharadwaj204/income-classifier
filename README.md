@@ -36,3 +36,4 @@ Additionally, you'll need to install the required dependencies. You can do this 
 ├── requirements.txt         # Python dependencies
 ├── train.py                 # Script for training the models
 └── README.md                # Project documentation
+"# income-classifier" 
