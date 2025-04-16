@@ -13,7 +13,7 @@ https://income-classifier.streamlit.app/
 
 Make sure you have Python 3.6 or higher installed. You can download it from the official website: [python.org](https://www.python.org/downloads/).
 
-Additionally, you'll need to install the required dependencies. You can do this by running:
+Additionally, you'll need to install the required dependencies. You can do this by running:requirements.txt
 
 ```bash
 ├── assets/                  # Contains plots and visualizations
@@ -36,4 +36,3 @@ Additionally, you'll need to install the required dependencies. You can do this 
 ├── requirements.txt         # Python dependencies
 ├── train.py                 # Script for training the models
 └── README.md                # Project documentation
-"# income-classifier" 
